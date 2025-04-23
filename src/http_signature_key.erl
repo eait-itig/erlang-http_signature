@@ -121,10 +121,10 @@ fingerprint(#{ '__struct__' := ?MODULE, key := Key, module := Module, public := 
 		false ->
 			case DigestTypes of
 				[] ->
-					FingerprintString = public_key:ssh_hostkey_fingerprint(Key),
+					FingerprintString = ssh:hostkey_fingerprint(Key),
 					erlang:iolist_to_binary(FingerprintString);
 				_ ->
-					FingerprintStrings = public_key:ssh_hostkey_fingerprint(DigestTypes, Key),
+					FingerprintStrings = ssh:hostkey_fingerprint(DigestTypes, Key),
 					[erlang:iolist_to_binary(FingerprintString) || FingerprintString <- FingerprintStrings]
 			end
 	end;
@@ -205,8 +205,7 @@ decode_data(Data) ->
 	try
 		decode_pem(Data)
 	catch
-		Class:Reason ->
-			ST = erlang:get_stacktrace(),
+		Class:Reason:ST ->
 			try
 				decode_ssh(Data)
 			catch

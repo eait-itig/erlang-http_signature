@@ -68,7 +68,7 @@ generate_key(Key) when is_binary(Key) ->
 
 sign({hmac, Secret}, Algorithm, Message) ->
 	DigestType = algorithm_to_digest_type(Algorithm),
-	crypto:hmac(DigestType, Secret, Message).
+	crypto:mac(hmac, DigestType, Secret, Message).
 
 ssh_hostkey_fingerprint({hmac, Secret}, []) ->
 	?INLINE_FINGERPRINT_BC(crypto:hash(md5, Secret)).
