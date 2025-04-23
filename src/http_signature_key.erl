@@ -144,15 +144,6 @@ generate_key(#{ '__struct__' := ?MODULE, key := Key, module := Module, public :=
 generate_key(Key=#{ '__struct__' := ?MODULE, public := false }) ->
 	PublicKey = to_public(Key),
 	generate_key(PublicKey);
-% DSA
-generate_key(DSAPrivateKey=#'DSAPrivateKey'{}) ->
-	#{ key := DSAPublicKey } = to_public(from_record(DSAPrivateKey)),
-	generate_key(DSAPublicKey);
-generate_key({_, DSAParams=#'Dss-Parms'{}}) ->
-	generate_key({dsa, DSAParams});
-generate_key({dsa, Params}) ->
-	Key = #'DSAPrivateKey'{} = http_signature_dsa:generate_key(Params),
-	from_record(Key);
 % EC
 generate_key(#'ECPrivateKey'{ parameters = P }) ->
 	generate_key({ecdsa, P});
@@ -292,10 +283,6 @@ encode_ssh(Key=#{ '__struct__' := ?MODULE, public := false }) ->
 	PublicKey = to_public(Key),
 	encode_ssh(PublicKey).
 
-from_record(Key=#'DSAPrivateKey'{}) ->
-	new(#{ key => Key, module => http_signature_dsa, public => false });
-from_record(Key={_, #'Dss-Parms'{}}) ->
-	new(#{ key => Key, module => http_signature_dsa, public => true });
 from_record(Key=#'ECPrivateKey'{}) ->
 	new(#{ key => Key, module => http_signature_ecdsa, public => false });
 from_record(Key={#'ECPoint'{}, _}) ->
